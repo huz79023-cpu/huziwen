@@ -68,6 +68,9 @@ def _separate(audio_path):
     if wav.shape[0] > model_ch:
         # 多声道降混为 stereo
         wav = wav[:model_ch]
+    elif wav.shape[0] < model_ch:
+        # 声道不足（如单声道），复制补齐
+        wav = wav.repeat(model_ch, 1)
     wav = _resample(wav, sr)
 
     # 转 GPU
