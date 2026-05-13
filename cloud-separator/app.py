@@ -8,13 +8,21 @@ import io
 import os
 import zipfile
 import tempfile
+import traceback
 import torch
 import torchaudio
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, jsonify
 from demucs import pretrained
 from demucs.apply import apply_model
 
 app = Flask(__name__)
+
+# 全局异常捕获：所有未处理异常返回 JSON
+@app.errorhandler(Exception)
+def handle_exception(e):
+    trace = traceback.format_exc()
+    print(f"[Error] {trace}")
+    return jsonify({'error': str(e), 'traceback': trace}), 500
 
 model = None          # 模型单例（冷启动后常驻）
 model_sr = None       # 模型期望采样率
